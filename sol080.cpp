@@ -83,45 +83,6 @@ struct TupleHash {
     }
 };
 
-bool has_loop(vector<string>& grid, int r_obs, int c_obs, int srow, int scol) {
-
-    int row = srow, col = scol;
-
-    int m = grid[0].length(), n = grid.size();
-
-    auto valid = [n, m](int row, int col) {
-        return (row >= 0 && row < n && col >= 0 && col < m);
-    };
-
-    vi dirs = {-1, 0, 1, 0, -1};
-    int cur_dir = 0;
-
-    unordered_set<tuple<int, int, int>, TupleHash> hit_obstacles;
-
-    while (true) {
-
-        while (valid(row, col) && grid[row][col] != '#') {
-            row += dirs[cur_dir];
-            col += dirs[cur_dir + 1];
-        }
-
-        if (valid(row, col)) {
-            if (hit_obstacles.count({row, col, cur_dir}) > 0) {
-                return 1;
-            }
-            hit_obstacles.insert({row, col, cur_dir});
-        } else {
-            return 0;
-        }
-        row -= dirs[cur_dir];
-        col -= dirs[cur_dir + 1];
-        cur_dir++;
-        cur_dir %= 4;
-    }
-
-    return 0;
-}
-
 
 int main() {
     cin.tie(0)->sync_with_stdio(0);
@@ -131,79 +92,61 @@ int main() {
     string s;
     vector<string> grid;
 
-    string test ="abcd";
-    cout<<test<<endl;
-    test[2] = '#';
-    cout<<test<<endl;
+    vector<vector<pair<int, int>>> locs(128);
 
-    int col, row;
+
 
     int cur_row = 0;
+    int m;
     while (getline(fin, s)) {
-        grid.pb(s);
+        if (cur_row == 0)
+            m = s.length();
         for (int i=0; i<s.length(); i++) {
-            if (s[i] == '^') {
-                col = i;
-                row = cur_row;
-            }
+            if (s[i] == '.')
+                continue;
+            locs[(int) s[i]].pb({cur_row, i});
         }
         cur_row++;
     }
 
-    int m = grid[0].length(), n = grid.size();
+    int n = cur_row;
 
-    // vector<vector<bool>> visited(n, vector<bool>(m, 0));
+    vector<vector<bool>> antinode(n, vector<bool>(m, 0));
 
-    // auto valid = [n, m](int row, int col) {
-    //     return (row >= 0 && row < n && col >= 0 && col < m);
-    // };
-
-    // vi dirs = {-1, 0, 1, 0, -1};
-    // int cur_dir = 0;
-
-    // unordered_set<tuple<int, int, int>, TupleHash> hit_obstacles;
-
-    // while (true) {
-
-    //     while (valid(row, col) && grid[row][col] != '#') {
-    //         if (!visited[row][col]) {
-    //             visited[row][col] = 1;
-    //         }
-    //         row += dirs[cur_dir];
-    //         col += dirs[cur_dir + 1];
-    //     }
-
-    //     if (valid(row, col)) {
-    //         if (hit_obstacles.count({row, col, cur_dir}) > 0) {
-    //             break;
-    //         }
-    //         hit_obstacles.insert({row, col, cur_dir});
-    //     } else {
-    //         break;
-    //     }
-    //     row -= dirs[cur_dir];
-    //     col -= dirs[cur_dir + 1];
-    //     cur_dir++;
-    //     cur_dir %= 4;
-    // }
+    auto valid = [n, m](int row, int col) {
+        return (row >= 0 && row < n && col >= 0 && col < m);
+    };
 
     int res = 0;
-    for (int r=0; r<m; r++) {
-        for (int c=0; c<n; c++) {
-            // if (!visited[r][c])
-                // continue;
-            if (grid[r][c] != '.') {
-                continue;
+
+    int dr, dc, r1, r2, c1, c2;
+    for (int i=0; i<128; i++) {
+        for (int j=0; j<locs[i].size(); j++) {
+            for (int k=j+1; k<locs[i].size(); k++) {
+                r1 = locs[i][j].fi; 
+                r2 = locs[i][k].fi;
+                c1 = locs[i][j].se; 
+                c2 = locs[i][k].se;
+                dr = r1 - r2;
+                dc = c1 - c2;
+
+                if (valid(r1 + dr, c1 + dc) && !antinode[r1 + dr][c1 + dc]) {
+                    res++;
+                    antinode[r1 + dr][c1 + dc] = 1;
+                }
+                if (valid(r2 - dr, c2 - dc) && !antinode[r2 - dr][c2 - dc]) {
+                    res++;
+                    antinode[r2 - dr][c2 - dc] = 1;
+                }
             }
-            grid[r][c] = '#';
-            if (has_loop(grid, r, c, row, col)) {
-                res++;
-                // cout << r <<" "<<c<<endl;
-            }
-            grid[r][c] = '.';
         }
     }
 
+    // for (int i=0; i<antinode.size(); i++) {
+    //     vprint(antinode[i]);
+    // }
+
     fout << res << endl;
+
     return 0;
 }

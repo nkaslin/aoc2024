@@ -87,9 +87,7 @@ int main() {
 
     cout << s<< endl;
 
-    regex pattern(R"(mul\((\d+),(\d+)\))");
-    regex dont(R"(don\'t\(\))");
-    regex do_(R"(do\(\))");
+    regex pattern(R"(mul\((\d+),(\d+)\)|do\(\)|don't\(\))");
 
 
 
@@ -97,26 +95,27 @@ int main() {
     int x, y;
     ll res = 0;
 
+    int cur = 1;
 
     while (getline(fin, s)) {
         string::const_iterator searchStart(s.cbegin());
 
         
         while (regex_search(searchStart, s.cend(), matches, pattern)) {
-            x = stoi(matches[1]);
-            y = stoi(matches[2]);
-
-            res += x * y;
-
-            cout << x<<" "<<y<<endl;
-
-            cout<< matches.suffix().length()<<endl;
+            if (matches[0].str().find("mul") == 0) {
+                x = stoi(matches[1]);
+                y = stoi(matches[2]);
+                res += x * y * cur;
+            } else if (matches[0] == "do()") {
+                cur = 1;
+            } else if (matches[0] == "don't()") {
+                cur = 0;
+            }
 
             searchStart = matches.suffix().first;
         }
 
     }
-    
 
     fout << res << "\n";
 
