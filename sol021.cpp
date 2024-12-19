@@ -45,11 +45,7 @@ int main() {
         }
     }
 
-   
-
     fout << res << "\n";
-
-
 
     return 0;
 }

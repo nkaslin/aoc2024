@@ -34,11 +34,7 @@ int main() {
         res += is_safe;
     }
 
-   
-
     fout << res << "\n";
-
-
 
     return 0;
 }
