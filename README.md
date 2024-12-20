@@ -23,12 +23,10 @@ My solutions for AoC 2024
 | 16  | ✔️ Dijkstra | (✔️) Dijkstra + brute force |
 | 17  |  |  |
 | 18  | ✔️ Dijkstra | ✔️ Union Find |
-| 19  |  |  |
+| 19  | ✔️ Trie | ✔️ Trie |
 | 20  |  |  |
 | 21  |  |  |
 | 22  |  |  |
 | 23  |  |  |
 | 24  |  |  |
 | 25  |  |  |
-
-![](07572.jpg)
